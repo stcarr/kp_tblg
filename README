@@ -1,0 +1,45 @@
+
+kp_tblg
+
+Generates k-dot-p Hamiltonians based on
+ab initio models of twisted bilayer graphene.
+
+For reference, see (and please cite):
+
+"Minimal model for low-energy electronic states of twisted bilayer graphene."
+Stephen Carr, Shiang Fang, Ziyan Zhu, Efthimios Kaxiras
+https://arxiv.org/abs/1901.03420
+
+
+INSTALLATION:
+
+This code requires a c++ compiler and access to the header-only libraries:
+Eigen (required)
+pybind11 (optional)
+A python-readable library can be generated if the option is turned 
+on in the CMakeLists.txt file in this directory.
+
+To compile:
+
+mkdir build
+cd build
+cmake ..
+make
+
+
+USE:
+
+The class Kp_tblg_construct can be used to create accurate k-dot-p 
+Hamiltonians including relaxation of the layers.
+
+(1) Initalize:		  Kp_tblg_construct kp = Kp_tblg_construct(); 
+(2) Load data file: 	  kp.loadFiles("data/full_relax_kp_01-06-2019.dat");
+(3) Set twisting angle:   kp.setTwist(1); // in degrees
+(4) Set sparsity pattern: kp.prepare();
+(5) Access Hamiltonian:	  Eigen::MatrixXcd H = kp.getH(k); // k must be an Eigen::Vector2d
+
+Then use the hamiltonain H to e.g. compute bandstructure by diagonalization
+
+[In python, the usage is identical, except replace Eigen datatypes with their numpy counterparts]
+
+
