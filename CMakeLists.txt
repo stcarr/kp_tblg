@@ -27,7 +27,7 @@ find_package(Eigen3 REQUIRED)
 
 if(PYBIND_MAKE)
 	cmake_minimum_required(VERSION 2.8.12)
-	add_subdirectory(pybind11)
+	add_subdirectory(externals/pybind11)
 	pybind11_add_module(tblg_kpy pysrc/main.cpp)
 	target_link_libraries(tblg_kpy PRIVATE lib_kp_tblg)
 endif()
