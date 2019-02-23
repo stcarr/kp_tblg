@@ -16,15 +16,19 @@ INSTALLATION:
 This code requires a c++ compiler and access to the header-only libraries:
 Eigen (required)
 pybind11 (optional)
+
 A python-readable library can be generated if the option is turned 
 on in the CMakeLists.txt file in this directory.
+If making a python library, you have to pull the pybind11 repo by hand:
+
+ git submodule update --init --recursive
 
 To compile:
 
-mkdir build
-cd build
-cmake ..
-make
+ mkdir build
+ cd build
+ cmake ..
+ make
 
 
 USE:
