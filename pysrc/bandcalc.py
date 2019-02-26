@@ -30,7 +30,7 @@ for k_sec in range(num_sections):
 
 	for k0 in range(nk):
 
-		kfac = k0/nk
+		kfac = k0/(nk*1.0)
 
 		k_here = (1-kfac)*k_start + (kfac)*k_end
 
@@ -43,7 +43,7 @@ for k_sec in range(num_sections):
 		val_list2[k_idx,:] = vals2
 
 		k_idx = k_idx + 1
-		print(k_idx/(nk*num_sections))
+		print(k_idx/(nk*num_sections*1.0))
 
 plt.plot(val_list2,'r')
 plt.plot(val_list,'k')

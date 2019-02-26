@@ -30,6 +30,11 @@ To compile:
  cmake ..
  make
 
+[python note: if pybind11 is finding python.3.x instead of python.2.x, try:
+ 
+ cmake -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python ..
+
+instead of < cmake .. >, this will usually force it to use python (not python3)]
 
 USE:
 
