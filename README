@@ -47,3 +47,26 @@ Then use the hamiltonain H to e.g. compute bandstructure by diagonalization
 [In python, the usage is identical, except replace Eigen datatypes with their numpy counterparts]
 
 
+
+TESTING (C++):
+
+Execute the application app/kp_tblg_test:
+
+./app/kp_tblg_test
+
+This requires the data file (data/full_relax_kp-01-06-2019.dat) to be
+in the same folder as where the executable is called from.
+Note that the Eigen diagonalization routine is sometimes very slow, so this may take a while
+
+
+
+TESTING (PYTHON):
+ 
+For testing the python code, try using:
+
+pysrc/generate_H_example.py
+pysrc/bandcalc.py
+
+These require both the data-file (data/full_relax_kp_01-06-2019.dat)
+and the tblg_kpy.so library to be in the same folder as them.
+

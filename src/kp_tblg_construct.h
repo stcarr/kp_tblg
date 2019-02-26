@@ -22,8 +22,9 @@ class Kp_tblg_construct {
   private:
 
     double theta; // twisting angle
-    double inter_fac;
-    double strain_fac;
+    double inter_fac; // scales interlayer couplings
+    double strain_fac; // scales strain (intralayer) couplings
+    int full_mono_ham; // 0: Use dirac-cone approx, 1: Use full monolayer Hamiltonians
 
 
     // data storage sizes
@@ -88,6 +89,9 @@ class Kp_tblg_construct {
     void setInterFac(double interfac_in);
     void setStrainFac(double strainfac_in);
 
+    // 0: use Dirac cone approximation, 1: Use full monolayer Hamiltonian
+    void setFullMonoHam(int fullmonoham_in);
+
     // load kp data from file
     void loadFiles(string filename);
 
@@ -97,9 +101,18 @@ class Kp_tblg_construct {
     // sets up the sparsity pattern for the Hamilotnian
     void prepare();
 
+    // returns high symmetry pts in supercell BZ (for the currently set theta)
+    Vector2d getK();
+    Vector2d getM();
+    Vector2d getGamma();
+
+
     // simple functions to return 2x2 monolayer Hamlitonian at a given k
     Matrix2cd layer1Ham(Vector2d kknow);
     Matrix2cd layer2Ham(Vector2d kknow);
+
+    Matrix2cd layer1GradHam(Vector2d kknow, int dim);
+    Matrix2cd layer2GradHam(Vector2d kknow, int dim);
 
     // returns monolayer couplings for accurate onsite Hamiltonian construction
     double grapheneIntralayerTerm(int orbit_row, int orbit_col, array<int,2> vector);
@@ -108,12 +121,14 @@ class Kp_tblg_construct {
     vector< vector<double> > getReciprocal(vector< vector<double> > a_in);
     double crossProd(vector<double> x, vector<double> y, int dim);
 
-
     // returns complex matrix at given supercell momentum
     MatrixXcd getH(Vector2d k);
 
     // returns the size of matrix returned by getH with current settings
     int getSize();
+
+    // returns k-derivative of H at given supercell momentum
+    MatrixXcd getGradH(Vector2d k, int dim);
 
 
 };

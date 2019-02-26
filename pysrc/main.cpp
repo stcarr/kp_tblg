@@ -19,16 +19,21 @@ PYBIND11_MODULE(tblg_kpy, m) {
         .def("setTwist", &Kp_tblg_construct::setTwist)
         .def("loadFiles", &Kp_tblg_construct::loadFiles)
         .def("setInterFac", &Kp_tblg_construct::setInterFac)
-        .def("setStrainFac", &Kp_tblg_construct::setStrainFac) 
+        .def("setStrainFac", &Kp_tblg_construct::setStrainFac)
+        .def("setFullMonoHam", &Kp_tblg_construct::setFullMonoHam)
         .def("interpKP", &Kp_tblg_construct::interpKP)
-	.def("prepare", &Kp_tblg_construct::prepare)
+	      .def("prepare", &Kp_tblg_construct::prepare)
+        .def("getK",  &Kp_tblg_construct::getK)
+        .def("getM",  &Kp_tblg_construct::getM)
+        .def("getGamma",  &Kp_tblg_construct::getGamma)
         .def("layer1Ham", &Kp_tblg_construct::layer1Ham)
         .def("layer2Ham", &Kp_tblg_construct::layer2Ham)
         .def("grapheneIntralayerTerm", &Kp_tblg_construct::grapheneIntralayerTerm)
         .def("getReciprocal", &Kp_tblg_construct::getReciprocal)
         .def("crossProd", &Kp_tblg_construct::crossProd)
+        .def("getSize", &Kp_tblg_construct::getSize)
         .def("getH", &Kp_tblg_construct::getH)
-        .def("getSize", &Kp_tblg_construct::getSize);
+        .def("getGradH", &Kp_tblg_construct::getGradH);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

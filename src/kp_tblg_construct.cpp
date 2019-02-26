@@ -23,6 +23,7 @@ Kp_tblg_construct::Kp_tblg_construct(){
 
   inter_fac = 1.0;
   strain_fac = 1.0;
+  full_mono_ham = 0;
 
 }
 
@@ -44,6 +45,7 @@ Kp_tblg_construct::Kp_tblg_construct(double theta_in){
     theta = theta_in;
     inter_fac = 1.0;
     strain_fac = 1.0;
+    full_mono_ham = 0;
 }
 
 // define twisting angle, can be changed before call to prepare
@@ -65,6 +67,13 @@ void Kp_tblg_construct::setStrainFac(double strainfac_in){
   strain_fac = strainfac_in;
 
 }
+
+void Kp_tblg_construct::setFullMonoHam(int fullmonoham_in){
+
+  full_mono_ham = fullmonoham_in;
+
+}
+
 
 void Kp_tblg_construct::loadFiles(string filename){
 
@@ -543,8 +552,8 @@ void Kp_tblg_construct::prepare(){
   }
 
   // for now these are just = 1, adds a local phase rotaion to each layer but doesn't seem needed
-  expfac1 = exp(complex<double>(0.0,0.0*rot_theta/2.0));
-  expfac2 = exp(complex<double>(0.0,0.0*-rot_theta/2.0));
+  expfac1 = exp(complex<double>(0.0, rot_theta/2.0));
+  expfac2 = exp(complex<double>(0.0,-rot_theta/2.0));
 
   all_index_L1.resize(unit_dim*num_hex);
   all_index_L2.resize(unit_dim*num_hex);
@@ -722,25 +731,71 @@ void Kp_tblg_construct::prepare(){
 
 }
 
+Vector2d Kp_tblg_construct::getK(){
+
+  double rot_theta = theta*M_PI/180.0;
+  double lattice_a = 1.42*sqrt(3.0);
+
+  double KD = 4*M_PI/(3.0*lattice_a);
+  double KTH = 2*KD*sin(rot_theta/2.0);
+  double HEX_BLEN = KTH*sqrt(3.0);
+
+  Vector2d hex_b1(HEX_BLEN*sqrt(3.0)/2.0,HEX_BLEN*-1.0/2.0);
+  Vector2d hex_b2(0.0,HEX_BLEN*1.0);
+
+  Vector2d K_pt = (hex_b1 - hex_b2)/3.0;
+  return K_pt;
+
+}
+
+Vector2d Kp_tblg_construct::getM(){
+
+  double rot_theta = theta*M_PI/180.0;
+  double lattice_a = 1.42*sqrt(3.0);
+
+  double KD = 4*M_PI/(3.0*lattice_a);
+  double KTH = 2*KD*sin(rot_theta/2.0);
+  double HEX_BLEN = KTH*sqrt(3.0);
+
+  Vector2d hex_b1(HEX_BLEN*sqrt(3.0)/2.0,HEX_BLEN*-1.0/2.0);
+  Vector2d hex_b2(0.0,HEX_BLEN*1.0);
+
+  Vector2d M_pt = hex_b1/2.0;
+  return M_pt;
+
+}
+
+Vector2d Kp_tblg_construct::getGamma(){
+
+  Vector2d Gamma_pt(0.0,0.0);
+  return Gamma_pt;
+
+}
+
 Matrix2cd Kp_tblg_construct::layer1Ham(Vector2d kknow){
 
   // the terms related to expfac2 need to be checked if quadratic Dirac terms nearest turned on
-  // (might be missusing expfac1 vs expfac2)
+  // (might be misusing expfac1 vs expfac2)
   Matrix2cd out = Matrix2cd::Zero(2,2);
-  /*
-  out(0,0) = Dirac_diag*kknow.dot(kknow);
-  out(0,1) = expfac1*Dirac_v1*complex<double>(kknow(1),-1.0*kknow(0))+pow(expfac2,2.0)*Dirac_v2*pow(complex<double>(kknow(0),-1.0*kknow(1)),2.0);
-  out(1,0) = conj(out(0,1));
-  out(1,1) = out(0,0);
-  return out;
-  */
 
+  // Dirac Cone approximation
+  if (full_mono_ham == 0){
+    out(0,0) = Dirac_diag*kknow.dot(kknow);
+    out(0,1) = expfac1*Dirac_v1*complex<double>(kknow(1),-1.0*kknow(0))+pow(expfac1,2.0)*Dirac_v2*pow(complex<double>(kknow(0),-1.0*kknow(1)),2.0);
+    out(1,0) = conj(out(0,1));
+    out(1,1) = out(0,0);
+    return out;
+  }
   /* =
   (1,1) : [Dirac_diag*dot(kknow,kknow),
   (1,2) : expfac1*Dirac_v1*(-i*kknow(1)+kknow(2))+(expfac2^2)*Dirac_v2*(kknow(1)-i*kknow(2))^2;
   (2,1) : conj(expfac1)*Dirac_v1*(i*kknow(1)+kknow(2))+(expfac1^2)*Dirac_v2*(kknow(1)+i*kknow(2))^2,
   (2,2) : Dirac_diag*dot(kknow,kknow)];
   */
+
+
+  // Otherwise do Full Hamiltonian
+
   double lattice_a = 1.42*sqrt(3.0);
 
   vector< vector<double> > a_base; // unrotated monolayer unit-cell
@@ -851,19 +906,23 @@ Matrix2cd Kp_tblg_construct::layer2Ham(Vector2d kknow){
   // the terms related to expfac2 need to be checked if quadratic Dirac terms nearest turned on
   // (might be missusing expfac1 vs expfac2)
   Matrix2cd out = Matrix2cd::Zero(2,2);
-  /*
-  out(0,0) = Dirac_diag*kknow.dot(kknow);
-  out(0,1) = expfac2*Dirac_v1*complex<double>(kknow(1),-1.0*kknow(0))+pow(expfac2,2.0)*Dirac_v2*pow(complex<double>(kknow(0),-1.0*kknow(1)),2.0);
-  out(1,0) = conj(out(0,1));
-  out(1,1) = out(0,0);
-  return out;
-  */
+
+  // Dirac Cone approximation
+  if (full_mono_ham == 0){
+    out(0,0) = Dirac_diag*kknow.dot(kknow);
+    out(0,1) = expfac2*Dirac_v1*complex<double>(kknow(1),-1.0*kknow(0))+pow(expfac2,2.0)*Dirac_v2*pow(complex<double>(kknow(0),-1.0*kknow(1)),2.0);
+    out(1,0) = conj(out(0,1));
+    out(1,1) = out(0,0);
+    return out;
+  }
   /* =
   (1,1) : [Dirac_diag*dot(kknow,kknow),
   (1,2) : expfac2*Dirac_v1*(-i*kknow(1)+kknow(2))+(expfac2^2)*Dirac_v2*(kknow(1)-i*kknow(2))^2;
   (2,1) : conj(expfac2)*Dirac_v1*(i*kknow(1)+kknow(2))+(expfac1^2)*Dirac_v2*(kknow(1)+i*kknow(2))^2,
   (2,2) : Dirac_diag*dot(kknow,kknow)];
   */
+
+  // Otherwise do full Hamiltonian
 
   double lattice_a = 1.42*sqrt(3.0);
 
@@ -966,6 +1025,75 @@ Matrix2cd Kp_tblg_construct::layer2Ham(Vector2d kknow){
   return out;
 
 }
+
+Matrix2cd Kp_tblg_construct::layer1GradHam(Vector2d kknow, int dim){
+
+  if (dim != 0 && dim != 1){
+    throw "ERROR: Invalid dimension for layer1GradHam!";
+  }
+
+  if (full_mono_ham != 0) {
+    throw "ERROR: layer1GradHam only implemented for Dirac cone approximation!";
+  }
+
+  Matrix2cd out = Matrix2cd::Zero(2,2);
+
+  /*
+  out(0,0) = Dirac_diag*kknow.dot(kknow);
+  out(0,1) = expfac1*Dirac_v1*complex<double>(kknow(1),-1.0*kknow(0))+pow(expfac2,2.0)*Dirac_v2*pow(complex<double>(kknow(0),-1.0*kknow(1)),2.0);
+  out(1,0) = conj(out(0,1));
+  out(1,1) = out(0,0);
+  */
+
+  // Dirac Cone approximation
+  if (full_mono_ham == 0){
+    out(0,0) = Dirac_diag*2.0*kknow[dim];
+    if (dim == 0){
+      out(0,1) = expfac1*Dirac_v1*complex<double>(0.0,-1.0) + pow(expfac1,2.0)*Dirac_v2*complex<double>(2.0, 0.0)*complex<double>(kknow(0),-1.0*kknow(1));
+    } else if (dim == 1){
+      out(0,1) = expfac1*Dirac_v1*complex<double>(1.0, 0.0) + pow(expfac1,2.0)*Dirac_v2*complex<double>(0.0,-2.0)*complex<double>(kknow(0),-1.0*kknow(1));
+    }
+    out(1,0) = conj(out(0,1));
+    out(1,1) = out(0,0);
+    return out;
+  }
+
+}
+
+Matrix2cd Kp_tblg_construct::layer2GradHam(Vector2d kknow, int dim){
+
+  if (dim != 0 && dim != 1){
+    throw "ERROR: Invalid dimension for layer1GradHam!";
+  }
+
+  if (full_mono_ham != 0) {
+    throw "ERROR: layer1GradHam only implemented for Dirac cone approximation!";
+  }
+
+  Matrix2cd out = Matrix2cd::Zero(2,2);
+
+
+  /*  out(0,0) = Dirac_diag*kknow.dot(kknow);
+      out(0,1) = expfac2*Dirac_v1*complex<double>(kknow(1),-1.0*kknow(0))+pow(expfac2,2.0)*Dirac_v2*pow(complex<double>(kknow(0),-1.0*kknow(1)),2.0);
+      out(1,0) = conj(out(0,1));
+      out(1,1) = out(0,0);
+  */
+
+  // Dirac Cone approximation
+  if (full_mono_ham == 0){
+    out(0,0) = Dirac_diag*2.0*kknow[dim];
+    if (dim == 0){
+      out(0,1) = expfac2*Dirac_v1*complex<double>(0.0,-1.0) + pow(expfac2,2.0)*Dirac_v2*complex<double>(2.0, 0.0)*complex<double>(kknow(0),-1.0*kknow(1));
+    } else if (dim == 1){
+      out(0,1) = expfac2*Dirac_v1*complex<double>(1.0, 0.0) + pow(expfac2,2.0)*Dirac_v2*complex<double>(0.0,-2.0)*complex<double>(kknow(0),-1.0*kknow(1));
+    }
+    out(1,0) = conj(out(0,1));
+    out(1,1) = out(0,0);
+    return out;
+  }
+
+}
+
 
 double Kp_tblg_construct::grapheneIntralayerTerm(int orbit_row, int orbit_col, array<int,2> vector){
   // convert displacement vector to Miller indices
@@ -1226,4 +1354,83 @@ vector< complex<double> > kminus_L1(tot_dim/2);
 
 int Kp_tblg_construct::getSize(){
   return tot_dim;
+}
+
+MatrixXcd Kp_tblg_construct::getGradH(Vector2d k, int dim){
+
+
+    // only need to construct the inter kplus/kminus terms here
+    // and the in-plane (monolayer) terms.
+    // The other precomputed terms are not k-dependent!
+
+    vector< Vector2d > shift_klist_L1;
+    vector< Vector2d > shift_klist_L2;
+
+    shift_klist_L1.resize(num_hex);
+    shift_klist_L2.resize(num_hex);
+
+    for (int i = 0; i < num_hex; ++i){
+      shift_klist_L1[i] = hex_all_L1[i] + k;
+      shift_klist_L2[i] = hex_all_L2[i] + k;
+    }
+
+    MatrixXcd Hmat_inter_kk = MatrixXcd::Zero(tot_dim,tot_dim);
+
+    int rspan = tot_dim/2;
+    int cspan = tot_dim/2;
+    for (int r = 0; r < rspan; ++r){
+      for (int c = 0; c < cspan; ++c){
+
+        //Hmat_inter_kk(all_index_L2[r],all_index_L1[c]) += Hmat_inter_kplus0(r,c)*kplus_L1[c] +  Hmat_inter_kminus0(r,c)*kminus_L1[c];
+
+        if (dim == 0){
+          Hmat_inter_kk(all_index_L2[r],all_index_L1[c]) += Hmat_inter_kplus0(r,c) + Hmat_inter_kminus0(r,c);
+        } else if (dim == 1){
+          Hmat_inter_kk(all_index_L2[r],all_index_L1[c]) += complex<double>(0.0,1.0)*(Hmat_inter_kplus0(r,c) - Hmat_inter_kminus0(r,c));
+        }
+
+      }
+    }
+
+
+    // MATLAB vers for H_12:
+    /*
+    Hmat_inter_kk(all_index_L2(:),all_index_L1(:)) = ...
+        Hmat_inter_kk(all_index_L2(:),all_index_L1(:)) +  ...
+        (Hmat_inter_kplus0*kplus_L1+Hmat_inter_kminus0*kminus_L1)*1;
+    */
+
+    // H_inter = H_12 + H_21
+    Hmat_inter_kk = Hmat_inter_kk + Hmat_inter_kk.adjoint().eval();
+
+
+    MatrixXcd GradHmat;
+    // add in all precomputed terms
+    GradHmat = inter_fac*Hmat_inter_kk;
+
+    // add the intralayer part
+    // MATLAB vers:
+    // Hmat(all_index_L1(:,indh),all_index_L1(:,indh))=Hmat(all_index_L1(:,indh),all_index_L1(:,indh))+Layer1_ham(shift_klist_L1(indh,:));
+    // Hmat(all_index_L2(:,indh),all_index_L2(:,indh))=Hmat(all_index_L2(:,indh),all_index_L2(:,indh))+Layer2_ham(shift_klist_L2(indh,:));
+
+    for (int i = 0; i < num_hex; ++i){
+
+      Matrix2cd H_1 = layer1GradHam(shift_klist_L1[i], dim);
+      Matrix2cd H_2 = layer2GradHam(shift_klist_L2[i], dim);
+
+      int start_idx_L1 = all_index_L1[2*i];
+      int start_idx_L2 = all_index_L2[2*i];
+
+      for (int o1 = 0; o1 < unit_dim; ++o1) {
+        for (int o2 = 0; o2 < unit_dim; ++o2){
+
+          GradHmat(start_idx_L1+o1, start_idx_L1+o2) += H_1(o1, o2);
+          GradHmat(start_idx_L2+o1, start_idx_L2+o2) += H_2(o1, o2);
+
+        }
+      }
+    }
+
+    return GradHmat;
+
 }
