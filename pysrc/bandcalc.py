@@ -5,7 +5,7 @@ import math
 
 kp = tblg_kpy.Kp_tblg_construct()
 
-theta = 1.15
+theta = 0.8
 
 kp.setTwist(theta)
 kp.loadFiles("full_relax_kp_01-06-2019.dat")
@@ -45,8 +45,10 @@ for k_sec in range(num_sections):
 		k_idx = k_idx + 1
 		print(k_idx/(nk*num_sections*1.0))
 
-plt.plot(val_list2,'r')
-plt.plot(val_list,'k')
+nb = kp.getSize()
+E_f = val_list[1,nb/2] 
+plt.plot(val_list2-E_f,'r')
+plt.plot(val_list-E_f,'k')
 plt.axis([0, num_sections*nk-1, -0.1, 0.1])
 
 plt.show()
