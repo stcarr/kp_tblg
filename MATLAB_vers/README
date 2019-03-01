@@ -1,0 +1,32 @@
+MATLAB version of the relaxed k-dot-p mod
+Should agree with C++/Python version if using same data file...
+
+Summary of files:
+
+==== Main Functions:
+
+tblg_kp_calc_ext.m:
+  Creates kp Hamiltonians at desired thetas, then 
+  returns list of eigenvalues and k-pts.
+  Can be used for band-structure and fermi velocity calculations,
+  and results can be passed to interp_kp_dos.m for DoS calculation.
+
+interp_kp_dos.m:
+  Can be passed eigenvalues from ("full_bz",1) runs of tblg_kp_calc_ext.m
+  Uses a finite elements method to accurately reconstruct the DoS/IDoS
+  and returns {E,DoS,IDoS} sets for each passed "full_bz" dataset.
+
+==== Utility Functions:
+
+TwBLG_KP_sym_enforcer_inter.m:
+  Ensures symmetry of k_+- terms (depreciated after new file load)
+
+generate_k_line.m:
+  Simple tool to get proper sampling and scaling of line-cut
+  through the BZ for bandstructure calculations
+
+==== Utility Scripts:
+
+kp_terms_plotter.m:
+  Loads data file and looks at theta dependence of various 
+  kp terms (for paper, in preparation as of March 1st 2019).
