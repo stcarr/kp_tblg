@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-  double theta = 1.0;//1.00;
+  double theta = 2.0;
 
   // empty constructor
   Kp_tblg_construct kp_tool;
@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
    Vector2d kk4 = hex_b1/2.0;
 
    int num_sections = 3;
-   int nk = 20;
+   int nk = 4;
    vector < Vector2d > k_scan;
 
    vector <Vector2d> k_endpts;

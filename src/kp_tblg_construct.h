@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <complex>
+#include <array>
 
 using namespace std;
 using namespace Eigen;

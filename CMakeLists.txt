@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.4.0)
 PROJECT(tblg_kp)
 SET(CMAKE_BUILD_TYPE Debug)
 
-OPTION(PYBIND_MAKE "Uses pybind11 to make a .so that can be imported to python" ON)
+OPTION(PYBIND_MAKE "Use pybind11" OFF)
 
 # Define name and version of package
 SET(PACKAGE_NAME "tblg_kp" CACHE STRING "package_name" FORCE)

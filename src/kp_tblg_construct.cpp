@@ -14,6 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <iomanip>
 
 // --------------------------------------
 // Old constructor, no use of class Sdata
@@ -142,18 +143,31 @@ void Kp_tblg_construct::loadFiles(string filename){
 
                   string temp_string;
                   loop_ss >> temp_string;
-                  istringstream stm(temp_string);
+                  //istringstream stm(temp_string);
+		  double real, imag;
 
-                  double real, imag ;
-                  char ch ;
-
-                  if( stm >> real >> imag >> ch && ch == 'i' && !( stm >> ch ) )
-                      temp_kp_data[t][c][o1][o2] = complex<double>(real,imag);
-                  else{
+		  int str_failure = 0;
+		  double imag_sign = 1.0;
+		  // manual read of complex #
+		  size_t str_idx = temp_string.find_first_of("+-");
+		  if (temp_string[str_idx] == '+'){
+		  
+		  }
+	 	  else if (temp_string[str_idx] == '-'){
+		    imag_sign = -1.0;
+		  } else {
+		    str_failure = 1;
+		  }
+		
+		  if (str_failure == 0){ 
+		    real = stod(temp_string);
+		    imag = imag_sign*stod(temp_string.substr(str_idx+1));
+		    temp_kp_data[t][c][o1][o2] = complex<double>(real,imag);
+                  } else{
                     cerr << "badly formed number '" << temp_string << "'\n" ;
                     cerr << "exiting... \n";
                     return;
-                    }
+                  }
 
 
                 }
@@ -1046,7 +1060,7 @@ Matrix2cd Kp_tblg_construct::layer1GradHam(Vector2d kknow, int dim){
   */
 
   // Dirac Cone approximation
-  if (full_mono_ham == 0){
+  // if (full_mono_ham == 0){
     out(0,0) = Dirac_diag*2.0*kknow[dim];
     if (dim == 0){
       out(0,1) = expfac1*Dirac_v1*complex<double>(0.0,-1.0) + pow(expfac1,2.0)*Dirac_v2*complex<double>(2.0, 0.0)*complex<double>(kknow(0),-1.0*kknow(1));
@@ -1056,7 +1070,7 @@ Matrix2cd Kp_tblg_construct::layer1GradHam(Vector2d kknow, int dim){
     out(1,0) = conj(out(0,1));
     out(1,1) = out(0,0);
     return out;
-  }
+  // }
 
 }
 
@@ -1080,7 +1094,7 @@ Matrix2cd Kp_tblg_construct::layer2GradHam(Vector2d kknow, int dim){
   */
 
   // Dirac Cone approximation
-  if (full_mono_ham == 0){
+  // if (full_mono_ham == 0){
     out(0,0) = Dirac_diag*2.0*kknow[dim];
     if (dim == 0){
       out(0,1) = expfac2*Dirac_v1*complex<double>(0.0,-1.0) + pow(expfac2,2.0)*Dirac_v2*complex<double>(2.0, 0.0)*complex<double>(kknow(0),-1.0*kknow(1));
@@ -1090,7 +1104,7 @@ Matrix2cd Kp_tblg_construct::layer2GradHam(Vector2d kknow, int dim){
     out(1,0) = conj(out(0,1));
     out(1,1) = out(0,0);
     return out;
-  }
+  // }
 
 }
 
