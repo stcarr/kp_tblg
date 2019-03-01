@@ -146,10 +146,19 @@ void Kp_tblg_construct::loadFiles(string filename){
                   //istringstream stm(temp_string);
 		  double real, imag;
 
+		  // keep track of if the complex # read works or not
 		  int str_failure = 0;
+		  // sign of imaginary part
 		  double imag_sign = 1.0;
+		  
 		  // manual read of complex #
 		  size_t str_idx = temp_string.find_first_of("+-");
+
+		  // if real part is negative, we need to use this work around
+		  if(temp_string[0] == '-'){
+		    str_idx = temp_string.substr(str_idx+1).find_first_of("+-") + 1;
+		  } 
+
 		  if (temp_string[str_idx] == '+'){
 		  
 		  }
