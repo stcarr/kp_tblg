@@ -17,8 +17,8 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
     % option structure copied from Robert Cain on stackoverflow
     opts = struct(  ... % kp-model assumptions
                         'relax_type','full_relax', ... %type of relaxation
-                        ... % ^ 'full_relax', 'flat_relax', or 'no_relax'
-                        'use_bmd',0,  ... % Turns on BMD 2011 model
+                        ... % ^ 'full_relax', 'flat_relax', or 'no_relax' [not implemented yet]
+                        'use_bmd',0,  ... % Use BMD 2011 model [not im[plemented yet]
                     ... % k-sampling options
                         'vf_only',0,  ... % only computes fermi velocity
                         'gam_only',0, ... % only compute at gamma point
@@ -66,7 +66,9 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
                     sweep_vals scaleaxis sweep_kpts
         
         if (strcmp(opts.relax_type, 'full_relax'))
-            load('dft_full_relax_data_02-04-2019.mat');
+            %load('dft_full_relax_data_02-04-2019.mat');
+            filename = '../data/full_relax_kp_01-06-2019.dat';
+            [thetas, inter_kp, intra_bot_kp, intra_top_kp, inter_shells, intra_shells] = parse_datafile(filename);
         elseif (strcmp(opts.relax_type, 'flat_relax'))
             %load('dft_flat_relax_kp_data_11-02-2018.mat')
             fprintf('FLAT RELAX NOT IMPLEMENTED YET \n');
