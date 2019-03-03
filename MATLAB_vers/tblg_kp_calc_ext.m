@@ -18,7 +18,7 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
     opts = struct(  ... % kp-model assumptions
                         'relax_type','full_relax', ... %type of relaxation
                         ... % ^ 'full_relax', 'flat_relax', or 'no_relax' [not implemented yet]
-                        'use_bmd',0,  ... % Use BMD 2011 model [not im[plemented yet]
+                        'use_bmd',0,  ... % Use BMD 2011 model [not tested yet, might be bugged]
                     ... % k-sampling options
                         'vf_only',0,  ... % only computes fermi velocity
                         'gam_only',0, ... % only compute at gamma point
@@ -137,11 +137,8 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
         All_Eff_intra_shell_indices = intra_shells;
         All_Eff_inter_shell_indices = inter_shells;
         
-        % Symm enforcer, to make sure the numerically calculated terms
-        % do not break any assumed symmetery of our k-p Hamiltonian
-        [All_Eff_inter,All_Eff_inter_kplus,All_Eff_inter_kminus] = TwBLG_KP_sym_enforce_inter(All_Eff_inter,All_Eff_inter_kplus,All_Eff_inter_kminus);
-
         % we turn off k-dependent terms for intralayer coupling for now
+        % datafile is zeros anway (for now)
         kdep_fac2=0.0;
 
         All_Eff_intra_bot_kplus=squeeze(All_Eff_intra_bot_ext(1,:,:,:))*kdep_fac2;

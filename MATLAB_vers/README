@@ -18,8 +18,8 @@ interp_kp_dos.m:
 
 ==== Utility Functions:
 
-TwBLG_KP_sym_enforcer_inter.m:
-  Ensures symmetry of k_+- terms (depreciated after new file load)
+parse_datafile.m:
+  Reads datafile for use in tblg_kp_calc_ext.m
 
 generate_k_line.m:
   Simple tool to get proper sampling and scaling of line-cut
