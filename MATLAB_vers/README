@@ -3,6 +3,11 @@ Should agree with C++/Python version if using same data file...
 
 Summary of files:
 
+==== Demo file:
+
+kp_demo.m:
+  Runs examples of bandstructure and DoS calculations.
+
 ==== Main Functions:
 
 tblg_kp_calc_ext.m:
