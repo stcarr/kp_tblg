@@ -32,6 +32,11 @@ We are preparing additional datasets for smaller angles, but these will
 be relased seperately. They require many more "shells" for accuracy in
 the low-energy electronic states.
 
+
+NOTE ON UNITS:
+
+Our model uses energy units of eV and length units of Angstroms.
+
 INSTALLATION:
 
 This code requires a c++ compiler and access to the header-only libraries:
