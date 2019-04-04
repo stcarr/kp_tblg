@@ -150,25 +150,25 @@ void Kp_tblg_construct::loadFiles(string filename){
 		  int str_failure = 0;
 		  // sign of imaginary part
 		  double imag_sign = 1.0;
-		  
+
 		  // manual read of complex #
 		  size_t str_idx = temp_string.find_first_of("+-");
 
 		  // if real part is negative, we need to use this work around
 		  if(temp_string[0] == '-'){
 		    str_idx = temp_string.substr(str_idx+1).find_first_of("+-") + 1;
-		  } 
+		  }
 
 		  if (temp_string[str_idx] == '+'){
-		  
+
 		  }
 	 	  else if (temp_string[str_idx] == '-'){
 		    imag_sign = -1.0;
 		  } else {
 		    str_failure = 1;
 		  }
-		
-		  if (str_failure == 0){ 
+
+		  if (str_failure == 0){
 		    real = stod(temp_string);
 		    imag = imag_sign*stod(temp_string.substr(str_idx+1));
 		    temp_kp_data[t][c][o1][o2] = complex<double>(real,imag);
@@ -455,7 +455,9 @@ void Kp_tblg_construct::prepare(){
   vector< Vector2d > hex_coor;
   double hex_cut= hex_cut_fac*HEX_BLEN; // 3.21*HEX_BLEN;
 
-  int ind = 1;
+  G_to_index = MatrixXi::Constant(2*hex_M+1, 2*hex_M+1,-1);
+
+  int ind = 0;
   for (int ind1 = -hex_M; ind1 < hex_M+1; ++ind1) {
       for (int ind2 = -hex_M; ind2 < hex_M+1; ++ind2) {
 
@@ -463,9 +465,27 @@ void Kp_tblg_construct::prepare(){
 
           if (sqrt(vec.dot(vec)) < hex_cut ){
               hex_coor.push_back(vec);
+
+              G_to_index(ind1+hex_M,ind2+hex_M) = ind;
+              ind++;
           }
 
       }
+  }
+
+  num_hex = hex_coor.size();
+
+  index_to_G = MatrixXi::Constant(num_hex, 2,-1);
+
+  for (int ind1 = -hex_M; ind1 < hex_M+1; ++ind1) {
+      for (int ind2 = -hex_M; ind2 < hex_M+1; ++ind2) {
+           int idx_here = G_to_index(ind1+hex_M,ind2+hex_M);
+           if (idx_here != -1){
+             index_to_G(idx_here,0) = ind1;
+             index_to_G(idx_here,1) = ind2;
+
+           }
+       }
   }
 
   Vector3d moire_k_vec1(hex_b1[0], hex_b1[1], 0.0);
@@ -476,8 +496,6 @@ void Kp_tblg_construct::prepare(){
   Vector3d moire_L_x1 = 2.0*M_PI*moire_k_vec2.cross(moire_k_vec3)/vvv;
   Vector3d moire_L_x2 = 2.0*M_PI*moire_k_vec3.cross(moire_k_vec1)/vvv;
   Vector3d moire_L_x3 = 2.0*M_PI*moire_k_vec1.cross(moire_k_vec2)/vvv;
-
-  num_hex = hex_coor.size();
 
   // total number of DoFs for the KP hamiltonian
   // number of kpoints * number of DoF per k point * number of layers
@@ -538,6 +556,7 @@ void Kp_tblg_construct::prepare(){
         Vector2d pvec2_L1 = hex_all_L1[ind2];
         Vector2d pvec2_L2 = hex_all_L2[ind2];
 
+        //for (int indty = 0; indty < 3; ++indty){
         for (int indty = 0; indty < num_inter_qs; ++indty){
           Vector2d tmp_qvec = L12_qvecs[indty];
           Vector2d dvec_L12 = pvec2_L2 - pvec1_L1 - tmp_qvec;
@@ -545,10 +564,10 @@ void Kp_tblg_construct::prepare(){
           if (sqrt(dvec_L12.dot(dvec_L12)) < vecthres){
               connect_Mat_L12[ind2][ind1][indty] = 1.0;
               // if (ind2 == 0)
-              //cout << "L_12 coupling: [" << ind2 << ", " << num_hex - ind1 << ", " << indty << "] \n";
-              //cout << "pvec2_L2: \n" << pvec2_L2 << "\n";
-              //cout << "pvec1_L1: \n" << pvec1_L1 << "\n";
-              //cout << "tmp_qvec: \n" << tmp_qvec << "\n";
+              // cout << "L_12 coupling: [" << ind1 << ", " << ind2 << ", " << indty << "] \n";
+              // cout << "L1 G: \n" << index_to_G(ind1,0) << " " << index_to_G(ind1,1) << "\n";
+              // cout << "L2 G: \n" << index_to_G(ind2,0) << " " << index_to_G(ind2,1) << "\n";
+              // cout << "tmp_qvec: \n" << tmp_qvec << "\n";
 
             }
         }
@@ -1374,6 +1393,19 @@ vector< complex<double> > kminus_L1(tot_dim/2);
 
 
 }
+
+MatrixXi Kp_tblg_construct::getGToIndex(){
+
+  return G_to_index;
+
+}
+
+MatrixXi Kp_tblg_construct::getIndexToG(){
+
+  return index_to_G;
+
+}
+
 
 int Kp_tblg_construct::getSize(){
   return tot_dim;

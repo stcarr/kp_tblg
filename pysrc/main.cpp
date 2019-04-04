@@ -33,6 +33,8 @@ PYBIND11_MODULE(tblg_kpy, m) {
         .def("crossProd", &Kp_tblg_construct::crossProd)
         .def("getSize", &Kp_tblg_construct::getSize)
         .def("getH", &Kp_tblg_construct::getH)
+        .def("getGToIndex", &Kp_tblg_construct::getGToIndex)
+        .def("getIndexToG", &Kp_tblg_construct::getIndexToG)
         .def("getGradH", &Kp_tblg_construct::getGradH);
 
 #ifdef VERSION_INFO

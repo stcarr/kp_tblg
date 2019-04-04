@@ -68,6 +68,9 @@ class Kp_tblg_construct {
     MatrixXcd Hmat_strain_L1;
     MatrixXcd Hmat_strain_L2;
 
+    MatrixXi index_to_G;
+    MatrixXi G_to_index;
+
 
 	public:
 
@@ -124,6 +127,15 @@ class Kp_tblg_construct {
 
     // returns complex matrix at given supercell momentum
     MatrixXcd getH(Vector2d k);
+
+    MatrixXi getGToIndex();
+    MatrixXi getIndexToG();
+
+
+    // returns the k-basis for the most recent run
+    MatrixXcd getKbasis();
+
+
 
     // returns the size of matrix returned by getH with current settings
     int getSize();
