@@ -5,17 +5,29 @@ Generates k-dot-p Hamiltonians based on
 ab initio models of twisted bilayer graphene.
 A C++ (python compatible) and a MATLAB version included.
 
-For reference, see (and please cite):
+For reference of the k-dot-p model, see (and please cite):
 
 "Minimal model for low-energy electronic states of twisted bilayer graphene."
 Stephen Carr, Shiang Fang, Ziyan Zhu, Efthimios Kaxiras
 https://arxiv.org/abs/1901.03420
 
+The 8-band and 5-band reduced models can be found in (check the README!):
+./MATLAB_vers/wannierization/ 
+
+For reference of the 8-band and 5-band models, see (and please cite):
+
+"Derivation of Wannier orbitals and minimal-basis tight-binding 
+hamiltonians for twisted bilayer graphene: a first-principles approach."
+Stephen Carr, Shiang Fang, Hoi Chun Po, Ashvin Vishwanath, Efthimios Kaxiras
+[Citation to come soon (will be on arXiv shortly)!]
+
+=====
+
 CONTACT:
 stephencarr(at)g.harvard.edu
 Please let me know of any bugs, or if you have a feature request.
 
-
+=====
 
 NOTE ON DATASET:
 
@@ -32,10 +44,13 @@ We are preparing additional datasets for smaller angles, but these will
 be relased seperately. They require many more "shells" for accuracy in
 the low-energy electronic states.
 
+=====
 
 NOTE ON UNITS:
 
 Our model uses energy units of eV and length units of Angstroms.
+
+=====
 
 INSTALLATION:
 
@@ -62,6 +77,8 @@ To compile:
 
 instead of < cmake .. >, this will usually force it to use python (not python3)]
 
+=====
+
 USE:
 
 The class Kp_tblg_construct can be used to create accurate k-dot-p 
@@ -77,7 +94,7 @@ Then use the hamiltonain H to e.g. compute bandstructure by diagonalization
 
 [In python, the usage is identical, except replace Eigen datatypes with their numpy counterparts]
 
-
+=====
 
 TESTING (C++):
 
@@ -89,7 +106,7 @@ This requires the data file (data/full_relax_kp-01-06-2019.dat) to be
 in the same folder as where the executable is called from.
 Note that the Eigen diagonalization routine is sometimes very slow, so this may take a while
 
-
+=====
 
 TESTING (PYTHON):
  

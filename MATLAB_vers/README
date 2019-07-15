@@ -1,6 +1,8 @@
 MATLAB version of the relaxed k-dot-p mod
 Should agree with C++/Python version if using same data file...
 
+For the Wannierization methods, see the "wannierization/" folder
+
 Summary of files:
 
 ==== Demo file:

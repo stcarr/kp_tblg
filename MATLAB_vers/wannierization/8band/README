@@ -1,0 +1,30 @@
+Reduced model Hamiltonians and MATLAB scripts for bandstructure
+
+Summary of files:
+
+==== tblg_wan_run.m
+
+    Performs the Wannier projection technique and REWAN step,
+    saving all hamiltonian and Wannier function files in a directory.
+
+==== perturb_tests.m
+
+    Computes effects of external perturbation (electric displacement field,
+    substrate symm breaking onsite terms). Can plot resulting \Delta H both
+    before and after the REWAN step, as well as band structures.
+
+==== wf_spread_and_viewer.m
+
+    For checking WF spread, can also view the WFs in 2D, with layer and
+    sublattice projections.
+
+==== wf_symm_viewer.m
+
+    For explicitly checking if the Wannier Functions satisfy C3, Mx, and C2T
+    The REWAN Wannier Functions have a "rephasing" which makes them behave
+    like more conventional "s", "pz" and "p+-" orbitals.
+
+==== "Everything-else.m"
+    
+    Functions and utilities needed for the above 4 scripts.
+    These have less comprehensive documentation (can email questions),

@@ -1,0 +1,19 @@
+Reduced model Hamiltonians and MATLAB scripts for bandstructure
+
+Summary of files:
+
+==== tblg_wan_run_5band.m
+
+    Performs the Wannier projection technique and REWAN step,
+    saving all hamiltonian and Wannier function files in a directory.
+
+==== wf_symm_viewer_5band.m
+
+    For explicitly checking if the Wannier Functions satisfy C3, Mx, and C2T
+    The REWAN Wannier Functions have a "rephasing" which makes them behave
+    like more conventional "s", "pz" and "p+-" orbitals.
+
+==== "Everything-else.m"
+    
+    Functions and utilities needed for the above 4 scripts.
+    These have less comprehensive documentation (can email questions),

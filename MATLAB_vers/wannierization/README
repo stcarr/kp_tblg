@@ -1,0 +1,21 @@
+Reduced model Hamiltonians and MATLAB scripts for generating the models from k-dot-p theory
+
+Summary of subdirectories:
+
+==== ./hmat_archive/
+
+  Stores Hamiltonians, includes MATLAB scripts for viewing band structure.
+  Note that the Wannier Functions are NOT saved, for memory constraints.
+  Use the "tblg_wan_run" scripts in the 8band or 5band directory to generate them locally.
+
+==== ./8band/
+
+  For generating the 8-band model, including effects of external field and substate perturbations.
+
+==== ./5band/
+
+  For generating both the "top" and "bot" 5-band models and their Wannier Functions
+
+==== ./projection_tools/
+
+  Stores MATLAB functions needed for the multi-step projection technique

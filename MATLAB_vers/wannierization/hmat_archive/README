@@ -1,0 +1,26 @@
+Reduced model Hamiltonians and MATLAB scripts for bandstructure
+
+Summary of files:
+
+==== band_demo.m
+
+   Generates band-structure for a given model and twisting-angle.
+   8band model : 0.60 to 1.30 degrees, in 0.05 degree increments.
+   5band models: 0.85 to 1.30 degrees, in 0.05 degree increments.
+   [UNTESTED]: Can likely interpolate between the given twisting angles...?
+
+==== bands_from_hmat_asci.m
+
+   Function for generating high-symm band structure from given hmat file
+   Can be checked to get conventions for the hamiltonian data-files.
+
+Summary of subdirectories:
+
+==== ./hmat_2019-07-11/
+
+   Hamiltonians generated on July 11th, 2019.
+   8-band and 5-band Hamiltonians based on the paper: [arXiv link coming]
+   Defines:
+       H_mn(R_x,R_y) = t_real + i * t_cpx
+   Data structure (in .dat files):    
+        R_x    R_y    m    n    t_real    t_cpx
