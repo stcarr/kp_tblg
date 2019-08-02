@@ -5,21 +5,24 @@ Generates k-dot-p Hamiltonians based on
 ab initio models of twisted bilayer graphene.
 A C++ (python compatible) and a MATLAB version included.
 
-For reference of the k-dot-p model, see (and please cite):
+For reference of the k-dot-p model, see (and please cite) the following two works:
 
 "Minimal model for low-energy electronic states of twisted bilayer graphene."
 Stephen Carr, Shiang Fang, Ziyan Zhu, Efthimios Kaxiras
 https://arxiv.org/abs/1901.03420
+
+"Angle-dependent ab initio low-energy hamiltonians for a relaxed twisted bilayer graphene heterostructure."
+Shiang Fang, Stephen Carr, Ziyan Zhu, Daniel Massatt, Efthimios Kaxiras
+https://arxiv.org/abs/1908.00058
 
 The 8-band and 5-band reduced models can be found in (check the README!):
 ./MATLAB_vers/wannierization/ 
 
 For reference of the 8-band and 5-band models, see (and please cite):
 
-"Derivation of Wannier orbitals and minimal-basis tight-binding 
-hamiltonians for twisted bilayer graphene: a first-principles approach."
+"Derivation of Wannier orbitals and minimal-basis tight-binding hamiltonians for twisted bilayer graphene: a first-principles approach."
 Stephen Carr, Shiang Fang, Hoi Chun Po, Ashvin Vishwanath, Efthimios Kaxiras
-[Citation to come soon (will be on arXiv shortly)!]
+https://arxiv.org/abs/1907.06282
 
 =====
 
