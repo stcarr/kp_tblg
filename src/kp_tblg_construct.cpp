@@ -23,6 +23,8 @@
 Kp_tblg_construct::Kp_tblg_construct(){
 
   inter_fac = 1.0;
+  inter_AA_fac = 1.0;
+  inter_AB_fac = 1.0;
   strain_fac = 1.0;
   full_mono_ham = 0;
 
@@ -45,6 +47,8 @@ Kp_tblg_construct::Kp_tblg_construct(double theta_in){
 
     theta = theta_in;
     inter_fac = 1.0;
+    inter_AA_fac = 1.0;
+    inter_AB_fac = 1.0;
     strain_fac = 1.0;
     full_mono_ham = 0;
 }
@@ -57,9 +61,24 @@ void Kp_tblg_construct::setTwist(double theta_in){
 
 }
 
+// rescales interlayer coupling
 void Kp_tblg_construct::setInterFac(double interfac_in){
 
   inter_fac = interfac_in;
+
+}
+
+// rescales only AA and BB interlayer coupling ("u0" or "w0")
+void Kp_tblg_construct::setInterAAFac(double interAAfac_in){
+
+  inter_AA_fac = interAAfac_in;
+
+}
+
+// rescales only AB and BA interlayer coupling ("u1" or "w1")
+void Kp_tblg_construct::setInterABFac(double interABfac_in){
+
+  inter_AB_fac = interABfac_in;
 
 }
 
@@ -683,9 +702,18 @@ void Kp_tblg_construct::prepare(){
         for (int c = 0; c < num_hex; ++c){
           for (int o1 = 0; o1 < unit_dim; ++o1){
             for (int o2 = 0; o2 < unit_dim; ++o2){
-              Hmat_inter(all_index_L2[unit_dim*r+o1],all_index_L1[unit_dim*c+o2]) += connect_Mat_L12[r][c][indq]*T_tmp[o1][o2];
+
+              double fac_here = 1.0;
+              if (o1 == o2){
+                fac_here = inter_AA_fac;
+              } else {
+                fac_here = inter_AB_fac;
+              }
+
+              Hmat_inter(all_index_L2[unit_dim*r+o1],all_index_L1[unit_dim*c+o2]) += fac_here*connect_Mat_L12[r][c][indq]*T_tmp[o1][o2];
               //if (abs(connect_Mat_L12[r][c][indq]) > 0.0 && r == 0)
                 //cout << connect_Mat_L12[r][c][indq]*T_tmp[o1][o2] << "added to Hmat_inter for " << r << " " << num_hex - c << " \n";
+
             }
           }
 
@@ -699,7 +727,16 @@ void Kp_tblg_construct::prepare(){
           for (int c = 0; c < num_hex; ++c){
             for (int o1 = 0; o1 < unit_dim; ++o1){
               for (int o2 = 0; o2 < unit_dim; ++o2){
-                Hmat_inter_kplus0(unit_dim*r+o1,unit_dim*c+o2) += connect_Mat_L12[r][c][indq]*T_tmp_kplus[o1][o2]*lattice_a;
+
+                double fac_here = 1.0;
+                if (o1 == o2){
+                  fac_here = inter_AA_fac;
+                } else {
+                  fac_here = inter_AB_fac;
+                }
+
+                Hmat_inter_kplus0(unit_dim*r+o1,unit_dim*c+o2) += fac_here*connect_Mat_L12[r][c][indq]*T_tmp_kplus[o1][o2]*lattice_a;
+
               }
             }
 
@@ -712,7 +749,16 @@ void Kp_tblg_construct::prepare(){
           for (int c = 0; c < num_hex; ++c){
             for (int o1 = 0; o1 < unit_dim; ++o1){
               for (int o2 = 0; o2 < unit_dim; ++o2){
-                Hmat_inter_kminus0(unit_dim*r+o1,unit_dim*c+o2) += connect_Mat_L12[r][c][indq]*T_tmp_kminus[o1][o2]*lattice_a;
+
+                double fac_here = 1.0;
+                if (o1 == o2){
+                  fac_here = inter_AA_fac;
+                } else {
+                  fac_here = inter_AB_fac;
+                }
+
+                Hmat_inter_kminus0(unit_dim*r+o1,unit_dim*c+o2) += fac_here*connect_Mat_L12[r][c][indq]*T_tmp_kminus[o1][o2]*lattice_a;
+
               }
             }
           }
@@ -742,7 +788,16 @@ void Kp_tblg_construct::prepare(){
         for (int c = 0; c < num_hex; ++c){
           for (int o1 = 0; o1 < unit_dim; ++o1){
             for (int o2 = 0; o2 < unit_dim; ++o2){
-              Hmat_inter_qplus0(all_index_L2[unit_dim*r+o1],all_index_L1[unit_dim*c+o2]) += connect_Mat_L12[r][c][indq]*T_tmp_kplus[o1][o2]*lattice_a*given_qplus/2.0;
+
+              double fac_here = 1.0;
+              if (o1 == o2){
+                fac_here = inter_AA_fac;
+              } else {
+                fac_here = inter_AB_fac;
+              }
+
+              Hmat_inter_qplus0(all_index_L2[unit_dim*r+o1],all_index_L1[unit_dim*c+o2]) += fac_here*connect_Mat_L12[r][c][indq]*T_tmp_kplus[o1][o2]*lattice_a*given_qplus/2.0;
+
             }
           }
 
@@ -757,7 +812,15 @@ void Kp_tblg_construct::prepare(){
         for (int c = 0; c < num_hex; ++c){
           for (int o1 = 0; o1 < unit_dim; ++o1){
             for (int o2 = 0; o2 < unit_dim; ++o2){
-              Hmat_inter_qminus0(all_index_L2[unit_dim*r+o1],all_index_L1[unit_dim*c+o2]) += connect_Mat_L12[r][c][indq]*T_tmp_kminus[o1][o2]*lattice_a*given_qminus/2.0;
+
+              double fac_here = 1.0;
+              if (o1 == o2){
+                fac_here = inter_AA_fac;
+              } else {
+                fac_here = inter_AB_fac;
+              }
+
+              Hmat_inter_qminus0(all_index_L2[unit_dim*r+o1],all_index_L1[unit_dim*c+o2]) += fac_here*connect_Mat_L12[r][c][indq]*T_tmp_kminus[o1][o2]*lattice_a*given_qminus/2.0;
             }
           }
 

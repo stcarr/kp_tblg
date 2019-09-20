@@ -24,6 +24,8 @@ class Kp_tblg_construct {
 
     double theta; // twisting angle
     double inter_fac; // scales interlayer couplings
+    double inter_AA_fac; // scales AA and BB interlayer couplings
+    double inter_AB_fac; // scales AB and BA interlayer couplings
     double strain_fac; // scales strain (intralayer) couplings
     int full_mono_ham; // 0: Use dirac-cone approx, 1: Use full monolayer Hamiltonians
 
@@ -91,6 +93,9 @@ class Kp_tblg_construct {
 
     // set the strength of Interlayer and Strain terms in the Hamiltonian
     void setInterFac(double interfac_in);
+    void setInterAAFac(double interAAfac_in);
+    void setInterABFac(double interABfac_in);
+
     void setStrainFac(double strainfac_in);
 
     // 0: use Dirac cone approximation, 1: Use full monolayer Hamiltonian

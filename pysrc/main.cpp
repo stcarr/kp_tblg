@@ -19,6 +19,8 @@ PYBIND11_MODULE(tblg_kpy, m) {
         .def("setTwist", &Kp_tblg_construct::setTwist)
         .def("loadFiles", &Kp_tblg_construct::loadFiles)
         .def("setInterFac", &Kp_tblg_construct::setInterFac)
+        .def("setInterAAFac", &Kp_tblg_construct::setInterAAFac)
+        .def("setInterABFac", &Kp_tblg_construct::setInterABFac)
         .def("setStrainFac", &Kp_tblg_construct::setStrainFac)
         .def("setFullMonoHam", &Kp_tblg_construct::setFullMonoHam)
         .def("interpKP", &Kp_tblg_construct::interpKP)
