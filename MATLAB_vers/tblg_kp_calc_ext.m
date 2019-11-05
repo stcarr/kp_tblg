@@ -32,7 +32,13 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
                         ...%'inter_shells',3, ... % keep up to 3rd NN inter couplings
                         'inter_qdep_shells',1, ... % keep NN inter k+- terms
                         'inter_fac',1.0, ... % controls strength of inter couplings
-                        'strain_fac',1.0 ... % controls strength of in-plane strain gauge field
+                        'inter_aa_fac',1.0, ... % controls effective AA coupling (w0)
+                        'inter_ab_fac',1.0, ... % controls effective AB coupling (w1)
+                        'strain_fac',1.0, ... % controls strength of in-plane strain gauge field
+                    ... % controls additional pertubations
+                        'displacement_strength',0.0, ... % onsite energy (positive for layer 1 and negative for layer 2, in eV)
+                        'sublattice_strength_sym',0.0, .... % sublattice symmetry breaking term, in eV.
+                        'sublattice_strength_asym',0.0 .... % sublattice symmetry breaking term, in eV.
                     );
 
     
@@ -77,6 +83,10 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
             fprintf('NO RELAX NOT IMPLEMENTED YET \n');
         end
 
+        onsite_E = opts.displacement_strength;
+        sublat_E_sym = opts.sublattice_strength_sym;
+        sublat_E_asym = opts.sublattice_strength_asym;
+        
 
         % set a cut-off condition for the k-p model
         % that scales automatically with theta
@@ -133,6 +143,25 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
         All_Eff_intra_top(isnan(All_Eff_intra_top)) = 0;
         All_Eff_inter_kplus(isnan(All_Eff_inter_kplus)) = 0;
         All_Eff_inter_kminus(isnan(All_Eff_inter_kminus)) = 0;
+        
+        % inter AA/AB scaling (w0/w1)
+        w0 = opts.inter_aa_fac;
+        w1 = opts.inter_ab_fac;
+        
+        All_Eff_inter(1,1,:) = w0*All_Eff_inter(1,1,:);
+        All_Eff_inter(2,2,:) = w0*All_Eff_inter(2,2,:);
+        All_Eff_inter(1,2,:) = w1*All_Eff_inter(1,2,:);
+        All_Eff_inter(2,1,:) = w1*All_Eff_inter(2,1,:);
+        
+        All_Eff_inter_kplus(1,1,:) = w0*All_Eff_inter_kplus(1,1,:);
+        All_Eff_inter_kplus(2,2,:) = w0*All_Eff_inter_kplus(2,2,:);
+        All_Eff_inter_kplus(1,2,:) = w1*All_Eff_inter_kplus(1,2,:);
+        All_Eff_inter_kplus(2,1,:) = w1*All_Eff_inter_kplus(2,1,:);
+        
+        All_Eff_inter_kminus(1,1,:) = w0*All_Eff_inter_kminus(1,1,:);
+        All_Eff_inter_kminus(2,2,:) = w0*All_Eff_inter_kminus(2,2,:);
+        All_Eff_inter_kminus(1,2,:) = w1*All_Eff_inter_kminus(1,2,:);
+        All_Eff_inter_kminus(2,1,:) = w1*All_Eff_inter_kminus(2,1,:);
         
         All_Eff_intra_shell_indices = intra_shells;
         All_Eff_inter_shell_indices = inter_shells;
@@ -222,8 +251,8 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
             max_intra_q = 5;
             max_inter_q = 5;
         elseif tar_theta > 0.3
-            max_intra_q = 12;
-            max_inter_q = 12;            
+            max_intra_q = length(All_Eff_intra_shell_indices);
+            max_inter_q = length(All_Eff_inter_shell_indices);
         end
         
         %max_intra_q = 3;
@@ -626,6 +655,22 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
             for indh=1:num_hex
                 Hmat(all_index_L1(:,indh),all_index_L1(:,indh))=Hmat(all_index_L1(:,indh),all_index_L1(:,indh))+Layer1_ham(shift_klist_L1(indh,:));
                 Hmat(all_index_L2(:,indh),all_index_L2(:,indh))=Hmat(all_index_L2(:,indh),all_index_L2(:,indh))+Layer2_ham(shift_klist_L2(indh,:));
+            
+                % onsite energy
+                Hmat(all_index_L1(1,indh),all_index_L1(1,indh)) = Hmat(all_index_L1(1,indh),all_index_L1(1,indh)) - onsite_E;
+                Hmat(all_index_L1(2,indh),all_index_L1(2,indh)) = Hmat(all_index_L1(2,indh),all_index_L1(2,indh)) - onsite_E;
+                
+                Hmat(all_index_L2(1,indh),all_index_L2(1,indh)) = Hmat(all_index_L2(1,indh),all_index_L2(1,indh)) + onsite_E;
+                Hmat(all_index_L2(2,indh),all_index_L2(2,indh)) = Hmat(all_index_L2(2,indh),all_index_L2(2,indh)) + onsite_E;
+                
+                % sublattice sym breaking term
+                Hmat(all_index_L1(1,indh),all_index_L1(1,indh)) = Hmat(all_index_L1(1,indh),all_index_L1(1,indh)) - (sublat_E_sym + sublat_E_asym);
+                Hmat(all_index_L1(2,indh),all_index_L1(2,indh)) = Hmat(all_index_L1(2,indh),all_index_L1(2,indh)) + (sublat_E_sym + sublat_E_asym);
+                
+                Hmat(all_index_L2(1,indh),all_index_L2(1,indh)) = Hmat(all_index_L2(1,indh),all_index_L2(1,indh)) - (sublat_E_sym - sublat_E_asym);
+                Hmat(all_index_L2(2,indh),all_index_L2(2,indh)) = Hmat(all_index_L2(2,indh),all_index_L2(2,indh)) + (sublat_E_sym - sublat_E_asym);
+                
+            
             end
             [newbands,indband]=sort(real(eig(Hmat)),'ascend');
             allbands1(:,indk)=newbands;

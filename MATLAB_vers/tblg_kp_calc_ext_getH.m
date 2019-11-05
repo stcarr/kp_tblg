@@ -28,6 +28,8 @@ function [sweep_H, hex_all_out] = tblg_kp_calc_ext_getH(varargin)
                         ...%'inter_shells',3, ... % keep up to 3rd NN inter couplings
                         'inter_qdep_shells',1, ... % keep NN inter k+- terms
                         'inter_fac',1.0, ... % controls strength of inter couplings
+                        'inter_aa_fac',1.0, ... % controls effective AA coupling (w0)
+                        'inter_ab_fac',1.0, ... % controls effective AB coupling (w1)
                         'strain_fac',1.0, ... % controls strength of in-plane strain gauge field
                     ... % controls additional pertubations
                         'displacement_strength',0.0, ... % onsite energy (positive for layer 1 and negative for layer 2, in eV)
@@ -136,6 +138,25 @@ function [sweep_H, hex_all_out] = tblg_kp_calc_ext_getH(varargin)
         All_Eff_inter_kplus(isnan(All_Eff_inter_kplus)) = 0;
         All_Eff_inter_kminus(isnan(All_Eff_inter_kminus)) = 0;
         
+        % inter AA/AB scaling (w0/w1)
+        w0 = opts.inter_aa_fac;
+        w1 = opts.inter_ab_fac;
+        
+        All_Eff_inter(1,1,:) = w0*All_Eff_inter(1,1,:);
+        All_Eff_inter(2,2,:) = w0*All_Eff_inter(2,2,:);
+        All_Eff_inter(1,2,:) = w1*All_Eff_inter(1,2,:);
+        All_Eff_inter(2,1,:) = w1*All_Eff_inter(2,1,:);
+        
+        All_Eff_inter_kplus(1,1,:) = w0*All_Eff_inter_kplus(1,1,:);
+        All_Eff_inter_kplus(2,2,:) = w0*All_Eff_inter_kplus(2,2,:);
+        All_Eff_inter_kplus(1,2,:) = w1*All_Eff_inter_kplus(1,2,:);
+        All_Eff_inter_kplus(2,1,:) = w1*All_Eff_inter_kplus(2,1,:);
+        
+        All_Eff_inter_kminus(1,1,:) = w0*All_Eff_inter_kminus(1,1,:);
+        All_Eff_inter_kminus(2,2,:) = w0*All_Eff_inter_kminus(2,2,:);
+        All_Eff_inter_kminus(1,2,:) = w1*All_Eff_inter_kminus(1,2,:);
+        All_Eff_inter_kminus(2,1,:) = w1*All_Eff_inter_kminus(2,1,:);
+        
         All_Eff_intra_shell_indices = intra_shells;
         All_Eff_inter_shell_indices = inter_shells;
         
@@ -223,8 +244,8 @@ function [sweep_H, hex_all_out] = tblg_kp_calc_ext_getH(varargin)
             max_intra_q = 5;
             max_inter_q = 5;
         elseif tar_theta >= 0.3
-            max_intra_q = 12;
-            max_inter_q = 12;            
+            max_intra_q = length(All_Eff_intra_shell_indices);
+            max_inter_q = length(All_Eff_inter_shell_indices);            
         end
         
         %max_intra_q = 3;
