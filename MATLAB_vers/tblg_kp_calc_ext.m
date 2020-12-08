@@ -1,4 +1,9 @@
-function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
+function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(varargin)
+
+    calc_vecs = false;
+    if nargout() == 4
+        calc_vecs = true;
+    end
 
     % Computes eigenvalues for selected k-points according to the Name/Value
     % pair list supplied in varargin.
@@ -7,6 +12,8 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
     %   sweep_vals: Cell containing the nb x nk eigenvalues for each theta
     %   scaleaxis:  Cell containing the proper scaling for high-sym linecut
     %   sweep_kpts: Cell containing the kpts sampled for each theta
+    %   sweep_weights: Cell containing the weightings on selected positions
+    %           for each band at each k-point, for each theta (optional!!)
 
     % Some useful k-point info:
     %   our moire BZ gamma point is at [0 0]
@@ -38,7 +45,9 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
                     ... % controls additional pertubations
                         'displacement_strength',0.0, ... % onsite energy (positive for layer 1 and negative for layer 2, in eV)
                         'sublattice_strength_sym',0.0, .... % sublattice symmetry breaking term, in eV.
-                        'sublattice_strength_asym',0.0 .... % sublattice symmetry breaking term, in eV.
+                        'sublattice_strength_asym',0.0, .... % sublattice symmetry breaking term, in eV.
+                    ... % for LDOS calculation
+                        'ldos_positions',[0, 0; 1/3 1/3; 2/3 2/3; 0.5 0; 0 0.5] ... % poisitions for 
                     );
 
     
@@ -69,7 +78,7 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
     for tar_theta_idx = 1:length(tar_theta_list)
 
         clearvars -except tar_theta_idx tar_theta_list opts ...
-                    sweep_vals scaleaxis sweep_kpts
+                    sweep_vals scaleaxis sweep_kpts calc_vecs
         
         if (strcmp(opts.relax_type, 'full_relax'))
             %load('dft_full_relax_data_02-04-2019.mat');
@@ -202,6 +211,13 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
         %[All_Eff_inter,All_Eff_intra_bot,All_Eff_intra_top] = Fit_Model_parms(fname_parm,rot_theta);
 
         lattice_a=1.42*sqrt(3);
+        A = lattice_a*[sqrt(3)/2 sqrt(3)/2; -0.5 0.5];
+        G = 2*pi*inv(A');
+        K_orig = (G(:,2)-G(:,1))/3;
+        R_basis = [cos(rot_theta/2) -sin(rot_theta/2)
+                   sin(rot_theta/2) cos(rot_theta/2)];
+        K_L1 = R_basis'*K_orig;
+        K_L2 = R_basis*K_orig;
 
         unit_dim=2;
 
@@ -230,6 +246,9 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
 
         hex_b1=HEX_BLEN*[sqrt(3)/2,-1/2];
         hex_b2=HEX_BLEN*[0,1];
+        
+        G_sc = [hex_b1' hex_b2'];
+        A_sc = 2*pi*inv(G_sc');
 
         hex_shift=(-hex_b1+hex_b2)/3;
 
@@ -620,7 +639,7 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
         %
 
         allbands1=zeros(tot_dim,knum_tot);
-        allbands2=zeros(tot_dim,knum_tot);
+        allweights1=zeros(4,size(opts.ldos_positions,1),tot_dim,knum_tot); % orb/layer, nr, basis, nk
 
         for indk=1:knum_tot
             % just to see how long it is taking, can be turned off
@@ -644,7 +663,7 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
             Hmat_inter_kk(all_index_L2(:),all_index_L1(:))=Hmat_inter_kk(all_index_L2(:),all_index_L1(:))+(Hmat_inter_kplus0*kplus_L1+Hmat_inter_kminus0*kminus_L1)*1;
 
             Hmat_inter_kk=Hmat_inter_kk+Hmat_inter_kk';
-
+            
 
             Hmat = zeros(tot_dim);
             % construct the hamiltonian
@@ -652,6 +671,12 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
             %Hmat=(Hmat+Hmat')/2;
             % intralayer part
             % layer 1
+            
+            % next two lines: 
+            % for creating real-space weighting functions, for LDOS calcs
+            k_basis = zeros(4,tot_dim,2); % dimensions: Orb/Layer , basis, x/y
+            k_indicator = zeros(4,tot_dim); % dimensions: Orb/Layer, basis
+            
             for indh=1:num_hex
                 Hmat(all_index_L1(:,indh),all_index_L1(:,indh))=Hmat(all_index_L1(:,indh),all_index_L1(:,indh))+Layer1_ham(shift_klist_L1(indh,:));
                 Hmat(all_index_L2(:,indh),all_index_L2(:,indh))=Hmat(all_index_L2(:,indh),all_index_L2(:,indh))+Layer2_ham(shift_klist_L2(indh,:));
@@ -670,10 +695,42 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
                 Hmat(all_index_L2(1,indh),all_index_L2(1,indh)) = Hmat(all_index_L2(1,indh),all_index_L2(1,indh)) - (sublat_E_sym - sublat_E_asym);
                 Hmat(all_index_L2(2,indh),all_index_L2(2,indh)) = Hmat(all_index_L2(2,indh),all_index_L2(2,indh)) + (sublat_E_sym - sublat_E_asym);
                 
-            
+                % layer and orbital projected basis variables
+                k_basis(1,all_index_L1(1,indh),:) = shift_klist_L1(indh,:)+K_L1';
+                k_indicator(1,all_index_L1(1,indh)) = 1;
+                k_basis(2,all_index_L1(2,indh),:) = shift_klist_L1(indh,:)+K_L1';
+                k_indicator(2,all_index_L1(2,indh)) = 1;
+
+                k_basis(3,all_index_L2(1,indh),:) = shift_klist_L2(indh,:)+K_L2';
+                k_indicator(3,all_index_L2(1,indh)) = 1;
+                k_basis(4,all_index_L2(2,indh),:) = shift_klist_L2(indh,:)+K_L2';
+                k_indicator(4,all_index_L2(2,indh)) = 1;
+
             end
-            [newbands,indband]=sort(real(eig(Hmat)),'ascend');
-            allbands1(:,indk)=newbands;
+            
+            if (calc_vecs)
+                % diagonalize
+                [temp_vecs, temp_bands] = eig(Hmat);
+                % sort
+                [newbands,sort_idx]=sort(real(diag(temp_bands)),'ascend');
+                V = temp_vecs(:,sort_idx);
+                
+                % do the FT, using the orbital-projected k-bases
+                gpos = opts.ldos_positions; % positions, on a sq grid
+                % now positions in real-space (in Angstroms)
+                rx = A_sc(1,1)*gpos(:,1) + A_sc(1,2)*gpos(:,2);
+                ry = A_sc(2,1)*gpos(:,1) + A_sc(2,2)*gpos(:,2);
+                for o = 1:4 % need to do FT on each orbital DOF independently
+                    % 1:4 corresponds to [L1A, L1B, L2A, L2B]
+                    phase_mat = exp(1j*(rx.*squeeze(k_basis(o,:,1)) + ry.*squeeze(k_basis(o,:,2)))).*squeeze(k_indicator(o,:));
+                    allweights1(o,:,:,indk) = abs(phase_mat*V).^2/(size(phase_mat,1)/4);
+                end
+                
+                allbands1(:,indk)=newbands;
+            else
+                [newbands,sort_idx]=sort(real(eig(Hmat)),'ascend');        
+                allbands1(:,indk)=newbands;
+            end
 
             
             % don't use all_kpts2 (from old vers, TR partner of all_kpts1)
@@ -764,6 +821,7 @@ function [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext(varargin)
         sweep_vals{tar_theta_idx} = allbands1;
         scaleaxis{tar_theta_idx} = scale_axis1;
         sweep_kpts{tar_theta_idx} = all_kpts1;
+        sweep_weights{tar_theta_idx} = abs(allweights1);
         fprintf("%d / %d done with theta sweep \n",tar_theta_idx,length(tar_theta_list));
 
     end

@@ -7,9 +7,11 @@
 
 %% Get bandstructure data
 
-theta_list = [0.9:.05:1.1];
+%theta_list = [0.9:.05:1.1];
+theta_list = 1.0;
+tic
 [band_vals, bands_scaleaxis, band_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',10);
-
+toc
 
 %% Play with layer (e.g. E-field) or sublattice (e.g. hBN) symmetry breaking terms
 % see paper: Phys. Rev. Research 1, 033072 (2019).
@@ -35,7 +37,8 @@ sublattice_strength_asym = 0.0; % sublattice symmetry breaking term, in eV. (opp
 theta_list = [1.0];
 inter_AA_fac = 0.5; % screening can greatly reduce AA coupling
 inter_AB_fac = 1.0; % but won't change AB much
-[band_vals, bands_scaleaxis, band_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',20,'inter_aa_fac',inter_AA_fac,'inter_ab_fac',inter_AB_fac);
+[band_vals, bands_scaleaxis, band_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',20,...
+    'inter_aa_fac',inter_AA_fac,'inter_ab_fac',inter_AB_fac,'inter_fac', 1);
 
 %% Plot bandstructure data
 clf
@@ -75,7 +78,7 @@ for idx = 1:length(theta_list)
    
 end
 
-%% Get full BZ data
+%% Get full BZ data (DOS)
 clear all;
 
 theta_list = [0.9:.05:1.1];
@@ -122,4 +125,5 @@ for idx = 1:length(theta_list)
 
    
 end
+
 
