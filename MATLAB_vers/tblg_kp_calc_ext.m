@@ -42,6 +42,7 @@ function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(v
                         'inter_aa_fac',1.0, ... % controls effective AA coupling (w0)
                         'inter_ab_fac',1.0, ... % controls effective AB coupling (w1)
                         'strain_fac',1.0, ... % controls strength of in-plane strain gauge field
+                        'vf_fac',1.0, ... % controls fermi velocity (slope of cones, graphene intralayer coupling strength)
                     ... % controls additional pertubations
                         'displacement_strength',0.0, ... % onsite energy (positive for layer 1 and negative for layer 2, in eV)
                         'sublattice_strength_sym',0.0, .... % sublattice symmetry breaking term, in eV.
@@ -223,10 +224,10 @@ function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(v
 
 
         % sets the linear and quadratic term of the Dirac cones
-        Dirac_v1=5.2268;
+        Dirac_v1=5.2268*opts.vf_fac;
         Dirac_v2=2.2450*0; % no quadratic for now
         % Dirac_v=5.2;
-        Dirac_diag=-1.1142*1;
+        Dirac_diag=-1.1142*opts.vf_fac;
 
         % some important length scales for the Brill. Zone
         KD=4*pi/3/lattice_a;

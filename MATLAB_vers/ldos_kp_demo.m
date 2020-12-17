@@ -1,18 +1,20 @@
 %% Get full BZ data (LDOS)
 clear all;
 
-theta_list = 2.0;
+theta_list = 3.0;
 
 % realspace sampling
-nsamps = 20;
+nsamps = 5;
 dx = linspace(0,1,nsamps+1);
 dx = dx(1:end-1);
 [x,y] = meshgrid(dx,dx);
 
 ldos_pos = [x(:),y(:)];
 
+vf_fac = 1.2; % increase fermi velocity by 20%
+
 tic
-[sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext('theta_list',theta_list,'knum',20,'full_bz',1,'ldos_positions',ldos_pos);
+[sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext('theta_list',theta_list,'knum',20,'full_bz',1,'ldos_positions',ldos_pos,'vf_fac',vf_fac);
 
 [dos_sweep, ldos_sweep, E_list] = interp_kp_ldos(theta_list, sweep_vals, sweep_weights, sweep_kpts);
 toc
