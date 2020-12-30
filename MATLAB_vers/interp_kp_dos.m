@@ -3,7 +3,7 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
     tar_theta_list = theta_list;
 
     % number of extra bands to include
-    b_size = 5;
+    b_size = 10;
 
 
     for t_idx = 1:length(tar_theta_list)
@@ -96,7 +96,7 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
                 end
             end
         end
-        
+       
         max_E = 0.15;
         dE = max_E/6000;
         
@@ -110,6 +110,9 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
                 %dos(E_idx) = dos(E_idx)+1;
                 % replace this with proper gradient computation function!
                 % need slope |b| and cross sectional area (length) f!
+                
+                % our triangular mesh element is spanned by two vectors, v,w
+                
                 % v is dk1
                 v(1) = k_tris1(t,2,1) - k_tris1(t,1,1);
                 v(2) = k_tris1(t,2,2) - k_tris1(t,1,2);
@@ -118,7 +121,11 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
                 w(2) = k_tris1(t,3,2) - k_tris1(t,1,2);
                 % NOTE: here w(2) == 0!
 
+                % E0 is the difference between the sampled Energy and the
+                % vertex of the triangular mesh element
                 E0 = E - triangles1(t,1);
+                % Ev,Ew are the differences between the vertex and the v,w
+                % points of the triangular mesh element
                 Ev = triangles1(t,2) - triangles1(t,1);
                 Ew = triangles1(t,3) - triangles1(t,1);
 
@@ -127,6 +134,7 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
                    pause(10) 
                 end
 
+                % b is the gradient, we use w ~ x-hat to quickly compute it
                 b(1) = Ew/w(1);
                 b(2) = (Ev - b(1)*v(1)) / v(2);
 
@@ -137,6 +145,11 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
                 b = b/( w(2)*v(1) - w(1)*v(2));
                 %}
 
+                % The "t"s tell us where the "E0 energy cross section" 
+                % crosses the boundaries of the triangular mesh element.
+                % I.e: one of these has to fall outside of the finite range
+                % [0,1], and then we can calculate the cross-sectional area
+                % by using the other two (which will both be within [0,1]!)
                 t1 = E0/dot(b,v);
                 t2 = E0/dot(b,w);
                 t3 = (E0 - dot(b,v)) / dot(b,w-v);
@@ -169,6 +182,7 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
                 end
 
                 dos(E_idx) = dos(E_idx) + f/norm(b);
+                %dos_tots1(E_idx,t) = f/norm(b);
 
                end
                if E > min(triangles2(t,:)) && E < max(triangles2(t,:))  
@@ -233,6 +247,8 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
                 end
 
                 dos(E_idx) = dos(E_idx) + f/norm(b);
+                %dos_tots2(E_idx,t) = f/norm(b);
+
                end
             end
             %E_idx/length(E_list)

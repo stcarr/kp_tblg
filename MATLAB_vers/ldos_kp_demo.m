@@ -1,10 +1,10 @@
 %% Get full BZ data (LDOS)
 clear all;
 
-theta_list = 3.0;
+theta_list = 1.2;
 
 % realspace sampling
-nsamps = 5;
+nsamps = 8;
 dx = linspace(0,1,nsamps+1);
 dx = dx(1:end-1);
 [x,y] = meshgrid(dx,dx);
@@ -12,9 +12,10 @@ dx = dx(1:end-1);
 ldos_pos = [x(:),y(:)];
 
 vf_fac = 1.2; % increase fermi velocity by 20%
+knum = 18;
 
 tic
-[sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext('theta_list',theta_list,'knum',20,'full_bz',1,'ldos_positions',ldos_pos,'vf_fac',vf_fac);
+[sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext('theta_list',theta_list,'knum',knum,'full_bz',1,'ldos_positions',ldos_pos,'vf_fac',vf_fac);
 
 [dos_sweep, ldos_sweep, E_list] = interp_kp_ldos(theta_list, sweep_vals, sweep_weights, sweep_kpts);
 toc
@@ -45,7 +46,7 @@ colorbar
 ldos = ldos_sweep{1};
 dos = dos_sweep{1};
 
-tar_E = 1250;
+tar_E = 5480;
 
 clf
 subplot(2,1,1)

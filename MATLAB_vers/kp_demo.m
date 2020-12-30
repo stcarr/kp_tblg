@@ -81,10 +81,10 @@ end
 %% Get full BZ data (DOS)
 clear all;
 
-theta_list = [0.9:.05:1.1];
+theta_list = 1.1;%[0.9:.05:1.1];
 
-[sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',10,'full_bz',1);
-
+[sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',15,'full_bz',1);
+%%
 [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(theta_list, sweep_vals, sweep_kpts);
 
 %% Plot DoS/IDoS data
@@ -92,22 +92,23 @@ theta_list = [0.9:.05:1.1];
 
 clf
 
-ax_m = .14;
+ax_m = .3;
 
 for idx = 1:length(theta_list)
    subplot(length(theta_list),1,length(theta_list)-idx+1)
    hold on
    
-   bands = band_vals{idx};
+   bands = sweep_vals{idx};
    nb = size(bands,1);
    nk = size(bands,2)/2;
-   E_f = bands(nb/2,1);
+   %E_f = bands(nb/2,1);
+   E_f = 0;
    
    dos_here = dos_sweep{idx};
    idos_here = idos_sweep{idx};
    plot(E_list-E_f,dos_here)
    
-   axis([-ax_m ax_m 0 10])
+   axis([-ax_m ax_m 0 inf])
    text(-ax_m*0.9,50,['$' num2str(theta_list(idx)) '^\circ$'],'FontSize',16)
  
    if (idx == 1)

@@ -545,7 +545,10 @@ function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(v
         elseif (opts.full_bz == 1) % samples over entire Brill. zone
             
             % use these for periodicity in interpolated DoS calc
-            bz_base_1 = hex_b1;
+            % Modify the default hexagonal basis to ensure b1 x b2 is 
+            % a CONVEX mesh element, i.e. angle between v,w is 60 degrees
+            % instead of 120 degrees (makes interpolation better).
+            bz_base_1 = hex_b1+hex_b2;
             bz_base_2 = hex_b2;
 
             % use these for irred. BZ
