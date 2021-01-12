@@ -265,15 +265,18 @@ function [dos_sweep, ldos_sweep, E_list] = interp_kp_ldos(theta_list, sweep_vals
             end
         end
 
-        tot_bands = 2*(b_size+1);
-        tot_bands = 4*tot_bands; % 2 for valley, 2 for spin
-        idos_rescale = tot_bands/idos(end);
+        %tot_bands = 2*(b_size+1);
+        %tot_bands = 4*tot_bands; % 2 for valley, 2 for spin
+        %idos_rescale = tot_bands/idos(end);
         alpha = 2.47;
         sc_alpha = alpha/(2*sind(tar_theta_list(t_idx)/2));
         sc_area = sc_alpha^2*sind(60)*1e-2; %area in nm^2
-        n0 = 1/sc_area;
-        dos_rescale = idos_rescale*n0;
+        %n0 = 1/sc_area;
+        %dos_rescale = idos_rescale*n0;
 
+        dos_rescale = 100*4/(2*pi)^2;
+        idos_rescale = dos_rescale*sc_area;
+        
         idos(:) = idos_rescale*(idos(:) - 0.5*idos(end));
 
         dos_sweep{t_idx} = dos_rescale*dos;

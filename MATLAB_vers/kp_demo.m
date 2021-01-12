@@ -83,8 +83,10 @@ clear all;
 
 theta_list = 1.1;%[0.9:.05:1.1];
 
-[sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',15,'full_bz',1);
-%%
+[sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',15,'full_bz',1, ...
+    'inter_aa_fac',1,'inter_ab_fac',1);
+
+%[dos_sweep, ~, E_list] = interp_kp_dos_gaussian(theta_list, sweep_vals, sweep_kpts);
 [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(theta_list, sweep_vals, sweep_kpts);
 
 %% Plot DoS/IDoS data

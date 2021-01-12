@@ -1,7 +1,7 @@
 %% Get full BZ data (LDOS)
 clear all;
 
-theta_list = 1.2;
+theta_list = 2;
 
 % realspace sampling
 nsamps = 8;
@@ -46,7 +46,7 @@ colorbar
 ldos = ldos_sweep{1};
 dos = dos_sweep{1};
 
-tar_E = 5480;
+tar_E = 4000;
 
 clf
 subplot(2,1,1)
@@ -63,6 +63,7 @@ ylabel('DoS')
 subplot(2,1,2)
 hold on
 box on
+caxis([0 inf])
 %{
 titles = {'AA','AB','BA','DW1','DW2'};
 %%{

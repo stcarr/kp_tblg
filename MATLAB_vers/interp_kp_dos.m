@@ -3,7 +3,7 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
     tar_theta_list = theta_list;
 
     % number of extra bands to include
-    b_size = 10;
+    b_size = 4;
 
 
     for t_idx = 1:length(tar_theta_list)
@@ -97,7 +97,7 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
             end
         end
        
-        max_E = 0.15;
+        max_E = 0.3;
         dE = max_E/6000;
         
         E_list = [-max_E:dE:max_E];
@@ -264,18 +264,24 @@ function [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(th
             end
         end
 
-        tot_bands = 2*(b_size+1);
-        tot_bands = 4*tot_bands; % 2 for valley, 2 for spin
-        idos_rescale = tot_bands/idos(end);
+        %tot_bands = 4*2*(b_size+1);% 2 for valley, 2 for spin
+        
         alpha = 2.47;
         sc_alpha = alpha/(2*sind(tar_theta_list(t_idx)/2));
         sc_area = sc_alpha^2*sind(60)*1e-2; %area in nm^2
-        n0 = 1/sc_area;
-        dos_rescale = idos_rescale*n0;
+        %n0 = 1/sc_area;
+        
+        %idos_rescale = tot_bands/idos(end);
+        %dos_rescale = idos_rescale*n0
+        
+        % 100 for A^2 -> nm^2, 4 for valley/spin, 4pi^2 for 
+        dos_rescale = 100*4/(2*pi)^2;
+        idos_rescale = dos_rescale*sc_area;
 
         idos(:) = idos_rescale*(idos(:) - 0.5*idos(end));
         [val, idx] = min(abs(idos - (-2)));
-
+        
+        
         idos_sweep{t_idx} = idos;
         dos_sweep{t_idx} = dos_rescale*dos;
         half_filling_hole_E(t_idx) = E_list(idx);
