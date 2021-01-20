@@ -563,6 +563,27 @@ function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(v
             ky_grid = bz_base_1(2)*x_grid + bz_base_2(2)*y_grid;
             all_kpts1 = [kx_grid(:) ky_grid(:)];
             all_kpts1(:,3) = 0;
+        elseif (opts.full_bz == 2) % samples over larger Brill. zone
+            
+            % use these for periodicity in interpolated DoS calc
+            % Modify the default hexagonal basis to ensure b1 x b2 is 
+            % a CONVEX mesh element, i.e. angle between v,w is 60 degrees
+            % instead of 120 degrees (makes interpolation better).
+            bz_base_1 = hex_b1+hex_b2;
+            bz_base_2 = hex_b2;
+
+            % use these for irred. BZ
+            %bz_base_1 = -kk1b;
+            %bz_base_2 = -kk1c;
+
+            bz_n = opts.knum;
+            dk = 1/bz_n;
+            grid_mesh = -1:dk:1;
+            [x_grid,y_grid] = meshgrid(grid_mesh,grid_mesh);
+            kx_grid = bz_base_1(1)*x_grid + bz_base_2(1)*y_grid;
+            ky_grid = bz_base_1(2)*x_grid + bz_base_2(2)*y_grid;
+            all_kpts1 = [kx_grid(:) ky_grid(:)];
+            all_kpts1(:,3) = 0;
         end
 
         knum_tot=size(all_kpts1);
