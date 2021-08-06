@@ -82,16 +82,14 @@ function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(v
                     sweep_vals scaleaxis sweep_kpts calc_vecs
         
         if (strcmp(opts.relax_type, 'full_relax'))
-            %load('dft_full_relax_data_02-04-2019.mat');
             filename = '../data/full_relax_kp_01-06-2019.dat';
-            [thetas, inter_kp, intra_bot_kp, intra_top_kp, inter_shells, intra_shells] = parse_datafile(filename);
         elseif (strcmp(opts.relax_type, 'flat_relax'))
             %load('dft_flat_relax_kp_data_11-02-2018.mat')
             fprintf('FLAT RELAX NOT IMPLEMENTED YET \n');
         else % load no_relax as default otherwise
-            %load('dft_no_relax_kp_data_11-02-2018.mat');
-            fprintf('NO RELAX NOT IMPLEMENTED YET \n');
+            filename = '../data/no_relax_kp_08-06-2021.dat';
         end
+        [thetas, inter_kp, intra_bot_kp, intra_top_kp, inter_shells, intra_shells] = parse_datafile(filename);
 
         onsite_E = opts.displacement_strength;
         sublat_E_sym = opts.sublattice_strength_sym;
@@ -100,7 +98,7 @@ function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(v
 
         % set a cut-off condition for the k-p model
         % that scales automatically with theta
-        hex_cut_fac0 = 5;
+        hex_cut_fac0 = 5*1;
         theta_cut_0 = 1.5;
 
         % next two terms control the weight of strain and interlayer coupling
@@ -135,6 +133,11 @@ function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(v
         hex_cut_fac = hex_cut_fac0*sqrt(theta_cut_0/tar_theta);
         hex_cut_fac = max(hex_cut_fac,hex_cut_fac0);
 
+        if tar_theta < 0.42
+           fprintf("WARNING: Seleccted angle %f smaller than fitted dataset range, setting to 0.42 \n",tar_theta)
+           tar_theta = 0.42;
+        end
+        
         All_Eff_inter_ext = squeeze(interp1(thetas_deg,inter_kp,tar_theta));
         All_Eff_intra_bot_ext = squeeze(interp1(thetas_deg,intra_bot_kp,tar_theta));
         All_Eff_intra_top_ext = squeeze(interp1(thetas_deg,intra_top_kp,tar_theta));
@@ -271,8 +274,8 @@ function [sweep_vals, scaleaxis, sweep_kpts, sweep_weights] = tblg_kp_calc_ext(v
             max_intra_q = 5;
             max_inter_q = 5;
         elseif tar_theta > 0.3
-            max_intra_q = length(All_Eff_intra_shell_indices);
-            max_inter_q = length(All_Eff_inter_shell_indices);
+            max_intra_q = min(length(All_Eff_intra_shell_indices),10);
+            max_inter_q = min(length(All_Eff_inter_shell_indices),10);
         end
         
         %max_intra_q = 3;

@@ -8,10 +8,14 @@
 %% Get bandstructure data
 
 %theta_list = [0.9:.05:1.1];
-theta_list = 1.0;
+theta_list = 1.1;
 tic
+% relaxed
 [band_vals, bands_scaleaxis, band_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',10);
+% unrelaxed
+%[band_vals, bands_scaleaxis, band_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',10,'relax_type','no_relax');
 toc
+
 
 %% Play with layer (e.g. E-field) or sublattice (e.g. hBN) symmetry breaking terms
 % see paper: Phys. Rev. Research 1, 033072 (2019).
@@ -34,11 +38,11 @@ sublattice_strength_asym = 0.0; % sublattice symmetry breaking term, in eV. (opp
 %% Play with interlayer coupling strengths
 % (see: https://arxiv.org/abs/1910.07893)
 
-theta_list = [1.0];
-inter_AA_fac = 0.5; % screening can greatly reduce AA coupling
+theta_list = [0.42];
+inter_AA_fac = 1.0; % screening can greatly reduce AA coupling
 inter_AB_fac = 1.0; % but won't change AB much
 [band_vals, bands_scaleaxis, band_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',20,...
-    'inter_aa_fac',inter_AA_fac,'inter_ab_fac',inter_AB_fac,'inter_fac', 1);
+    'inter_aa_fac',inter_AA_fac,'inter_ab_fac',inter_AB_fac,'vf_fac', 1.2);
 
 %% Plot bandstructure data
 clf
@@ -81,10 +85,10 @@ end
 %% Get full BZ data (DOS)
 clear all;
 
-theta_list = 1.1;%[0.9:.05:1.1];
+theta_list = 0.42;%[0.9:.05:1.1];
 
 [sweep_vals, scaleaxis, sweep_kpts] = tblg_kp_calc_ext('theta_list',theta_list,'knum',15,'full_bz',1, ...
-    'inter_aa_fac',1,'inter_ab_fac',1);
+    'inter_aa_fac',1,'inter_ab_fac',1,'vf_fac',1.2);
 
 %[dos_sweep, ~, E_list] = interp_kp_dos_gaussian(theta_list, sweep_vals, sweep_kpts);
 [dos_sweep, idos_sweep, E_list, half_filling_hole_E] = interp_kp_dos(theta_list, sweep_vals, sweep_kpts);

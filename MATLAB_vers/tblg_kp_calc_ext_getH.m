@@ -61,17 +61,15 @@ function [sweep_H, hex_all_out] = tblg_kp_calc_ext_getH(varargin)
     end
 
     if (strcmp(opts.relax_type, 'full_relax'))
-        %load('dft_full_relax_data_02-04-2019.mat');
-        %filename = '../data/full_relax_kp_01-06-2019.dat';
-        filename = 'full_relax_kp_01-06-2019.dat';
-        [thetas, inter_kp, intra_bot_kp, intra_top_kp, inter_shells, intra_shells] = parse_datafile(filename);
+        filename = '../data/full_relax_kp_01-06-2019.dat';
     elseif (strcmp(opts.relax_type, 'flat_relax'))
         %load('dft_flat_relax_kp_data_11-02-2018.mat')
         fprintf('FLAT RELAX NOT IMPLEMENTED YET \n');
     else % load no_relax as default otherwise
-        %load('dft_no_relax_kp_data_11-02-2018.mat');
-        fprintf('NO RELAX NOT IMPLEMENTED YET \n');
+        filename = '../data/no_relax_kp_08-06-2021.dat';
     end
+    [thetas, inter_kp, intra_bot_kp, intra_top_kp, inter_shells, intra_shells] = parse_datafile(filename);
+
     
     onsite_E = opts.displacement_strength;
     sublat_E_sym = opts.sublattice_strength_sym;
@@ -244,8 +242,8 @@ function [sweep_H, hex_all_out] = tblg_kp_calc_ext_getH(varargin)
             max_intra_q = 5;
             max_inter_q = 5;
         elseif tar_theta >= 0.3
-            max_intra_q = length(All_Eff_intra_shell_indices);
-            max_inter_q = length(All_Eff_inter_shell_indices);            
+            max_intra_q = min(length(All_Eff_intra_shell_indices),10);
+            max_inter_q = min(length(All_Eff_inter_shell_indices),10);            
         end
         
         %max_intra_q = 3;
