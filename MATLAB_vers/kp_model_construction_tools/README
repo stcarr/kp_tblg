@@ -1,0 +1,20 @@
+Tools for construction of a relaxed TBG Hamiltonian and kp extraction
+----------
+
+- parameter_extract_job.m: A full run of kp terms for variables defined 
+              in the file "global_vars.m"
+
+- global_vars.m: Parameters which control the parameter extraction job
+
+- run_script.sh/run_script_local.sh: SLURM style scripts that run 
+              parameter_extract_job.m
+
+folders:
+
+tbh_construct: Constructs the TBG supercell Hamiltonian (with relaxations)
+tbh_bands: Calculates band structure of tbh model
+kp_fit: Does a symmetrized fitting of the plane-wave overlaps for use in kp_tblg
+kp_bands: calculates band structure of kp model
+post_proc: compares bands between TBH and final kp models
+
+anglesweep_ext_01-06-2019: Full run of the kp term extraction used in this code

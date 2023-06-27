@@ -37,3 +37,10 @@ generate_k_line.m:
 kp_terms_plotter.m:
   Loads data file and looks at theta dependence of various 
   kp terms (for paper, in preparation as of March 1st 2019).
+
+==== Construction of the kp model from tight-binding Hamiltonian:
+
+The kp_model_construction_tools folder has scripts which generate a relaxed 
+supercell Hamiltonian, extract the relevant plane-wave interaction terms,
+and create a symmetrized data-file of the inter and intra-layer scattering
+terms for the kp method here.
